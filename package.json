@@ -1,0 +1,38 @@
+{
+  "author": {
+    "name": "Soares Chen",
+    "email": "soares.chen@gmail.com",
+    "url": "http://soareschen.com"
+  },
+  "name": "quiver-command-component",
+  "desription": "Quiver components that wrap around command line",
+  "version": "0.0.1",
+  "homepage": "https://github.com/quiverjs/command-component",
+  "repository": {
+    "url": "git@github.com:quiverjs/command-component.git"
+  },
+  "dependencies": {
+    "temp": "~0.7.0",
+    "quiver-error": "~0.1.0",
+    "quiver-module": "~0.1.2",
+    "quiver-file-stream": "~0.0.3",
+    "quiver-node-stream": "~0.0.5",
+    "quiver-pipe-stream": "~0.0.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "should": "~3.1.2"
+  },
+  "bugs": {
+    "url": "https://github.com/quiverjs/command-component/issues",
+    "email": "quiverjs@soareschen.com"
+  },
+  "licenses": {
+    "type": "MIT",
+    "url": "https://raw.github.com/quiverjs/license/master/LICENSE"
+  },
+  "main": "./lib/command-component",
+  "scripts": {
+    "test": "make test"
+  }
+}
