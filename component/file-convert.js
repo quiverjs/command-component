@@ -4,6 +4,7 @@ var tempLib = require('temp')
 var error = require('quiver-error').error
 var childProcess = require('child_process')
 var fileStreamLib = require('quiver-file-stream')
+var logProcessIO = require('../lib/log-stdio').logProcessIO
 
 var defaultTempPathBuilder = function(callback) {
   callback(null, tempLib.path())
@@ -33,29 +34,13 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
       })
   }
 
-  var logProcessIO = function(command, commandArgs) {
-    var logger = stdioLogger.newLog(commandArgs)
-
-    command.stdout.on('data', function (data) {
-      logger.stdout(data)
-    })
-
-    command.stderr.on('data', function (data) {
-      logger.stderr(data)
-    })
-    
-    command.on('exit', function(code) {
-      logger.exit(code)
-    })
-  }
-
   var runCommand = function(commandArgs, callback) {
     var commandName = commandArgs[0]
-    var args = commandArgs.slice(1)
+    var restArgs = commandArgs.slice(1)
 
-    var command = childProcess.spawn(commandName, args)
-
-    if(stdioLogger) logProcessIO(command, commandArgs)
+    var command = childProcess.spawn(commandName, restArgs)
+    
+    if(stdioLogger) logProcessIO(stdioLogger, command, commandArgs)
 
     // make sure the stdio streams are resumed/closed
     // so that the child process do not hang waiting 
