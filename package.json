@@ -23,6 +23,7 @@
     "quiver-copy": "~0.1.4",
     "quiver-config": "0.0.5",
     "quiver-component": "~0.2.1",
+    "quiver-stream-convert": "~0.0.11",
     "mocha": "~1.17.1",
     "should": "~3.1.2"
   },

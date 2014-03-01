@@ -22,7 +22,7 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
   var resultContentType = config.resultContentType || 'application/octet-stream'
 
   var getFilePaths = function(inputStreamable, callback) {
-    fileStreamLib.streamableToFile(inputStreamable, inputTempPathBuilder,
+    fileStreamLib.streamableToFilePath(inputStreamable, inputTempPathBuilder,
       function(err, inputFilePath) {
         if(err) return callback(err)
         
@@ -61,15 +61,17 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
       callback(null)
     })
 
-    setTimeout(function() {
-      if(processExited) return
+    if(commandTimeout) {
+      setTimeout(function() {
+        if(processExited) return
 
-      processExited = true
-      command.kill()
+        processExited = true
+        command.kill()
 
-      callback(error(500, 'child process timeout'))
-      
-    }, commandTimeout)
+        callback(error(500, 'child process timeout'))
+        
+      }, commandTimeout)
+    }
   }
 
   var handler = function(args, inputStreamable, callback) {
@@ -79,10 +81,10 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
       commandArgsExtractor(args, inputFilePath, outputFilePath, function(err, commandArgs) {
         if(err) return callback(err)
         
-        spawnProcess(commandArgs, function(err) {
+        runCommand(commandArgs, function(err) {
           if(err) return callback(err)
           
-          createFileStreamable(outputFilePath, function(err, resultStreamable) {
+          fileStreamLib.createFileStreamable(outputFilePath, function(err, resultStreamable) {
             if(err) return callback(err)
             
             resultStreamable.contentType = resultContentType
