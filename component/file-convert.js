@@ -100,7 +100,7 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
 
 var quiverComponents = [
   {
-    name: 'quiver file convert command component',
+    name: 'quiver file convert command handler',
     type: 'stream handler',
     configParam: [
       {

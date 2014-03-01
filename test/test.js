@@ -83,7 +83,7 @@ describe('command component test', function() {
     config.inputTempPathBuilder = tempPathBuilder
     config.outputTempPathBuilder = tempPathBuilder
 
-    configLib.loadStreamHandler(config, 'quiver file convert command component',
+    configLib.loadStreamHandler(config, 'quiver file convert command handler',
     function(err, handler) {
       if(err) return callback(err)
 
