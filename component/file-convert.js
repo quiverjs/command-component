@@ -16,8 +16,11 @@ var fileConvertCommandHandlerBuilder = function(config, callback) {
   var stdioLogger = config.stdioLogger
   var commandTimeout = config.commandTimeout
 
-  var inputTempPathBuilder = config.inputTempPathBuilder || defaultTempPathBuilder
-  var outputTempPathBuilder = config.outputTempPathBuilder || defaultTempPathBuilder
+  var inputTempPathBuilder = config.inputTempPathBuilder || 
+    config.tempPathBuilder || defaultTempPathBuilder
+    
+  var outputTempPathBuilder = config.outputTempPathBuilder || 
+    config.tempPathBuilder || defaultTempPathBuilder
 
   var resultContentType = config.resultContentType || 'application/octet-stream'
 
