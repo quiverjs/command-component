@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperties(exports, {
-  fileConvertHandler: {get: function() {
-      return fileConvertHandler;
+  makeFileConvertHandler: {get: function() {
+      return makeFileConvertHandler;
     }},
-  stdioConvertHandler: {get: function() {
-      return stdioConvertHandler;
+  makeStdioConvertHandler: {get: function() {
+      return makeStdioConvertHandler;
     }},
   __esModule: {value: true}
 });
-var fileConvertHandler = $traceurRuntime.assertObject(require('./file-convert.js')).fileConvertHandler;
-var stdioConvertHandler = $traceurRuntime.assertObject(require('./stdio-convert.js')).stdioConvertHandler;
+var makeFileConvertHandler = $traceurRuntime.assertObject(require('./file-convert.js')).makeFileConvertHandler;
+var makeStdioConvertHandler = $traceurRuntime.assertObject(require('./stdio-convert.js')).makeStdioConvertHandler;
 ;

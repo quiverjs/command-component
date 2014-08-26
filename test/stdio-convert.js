@@ -1,10 +1,11 @@
 import 'traceur'
 import { readFileSync } from 'fs'
+import { async } from 'quiver-promise'
 import { fileStreamable } from 'quiver-file-stream'
 import { streamableToText } from 'quiver-stream-util'
 import { loadStreamHandler } from 'quiver-component'
 
-import { stdioConvertHandler } from '../lib/stdio-convert.js'
+import { makeStdioConvertHandler } from '../lib/stdio-convert.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -13,7 +14,7 @@ chai.use(chaiAsPromised)
 var should = chai.should()
 
 describe('stdio convert test', () => {
-  it('basic test', () => {
+  it('basic test', async(function*() {
     var testFile = './test-content/00.txt'
     var expectedFile ='./test-content/00-grep.txt'
     var expectedResult = readFileSync(expectedFile).toString()
@@ -23,13 +24,12 @@ describe('stdio convert test', () => {
 
     var config = { getCommandArgs }
 
-    return Promise.all([
-      loadStreamHandler(config, stdioConvertHandler),
-      fileStreamable(testFile)
-    ]).then(([handler, inputStreamable]) => 
-      handler({}, inputStreamable).then(streamableToText)
-      .then(result => {
-        result.should.equal(expectedResult)
-      }))
-  })
+    var stdioConvertHandler = makeStdioConvertHandler()
+
+    var handler = yield loadStreamHandler(config, stdioConvertHandler)
+    var streamable = yield fileStreamable(testFile)
+
+    yield handler({}, streamable).then(streamableToText)
+      .should.eventually.equal(expectedResult)
+  }))
 })

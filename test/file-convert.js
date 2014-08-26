@@ -1,9 +1,10 @@
 import 'traceur'
 import { readFileSync } from 'fs'
+import { async } from 'quiver-promise'
 import { fileStreamable } from 'quiver-file-stream'
 import { streamableToText } from 'quiver-stream-util'
 
-import { fileConvertHandler } from '../lib/file-convert.js'
+import { makeFileConvertHandler } from '../lib/file-convert.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -12,7 +13,7 @@ chai.use(chaiAsPromised)
 var should = chai.should()
 
 describe('file convert handler test', () => {
-  it('basic test', () => {
+  it('basic test', async(function*() {
     var testFile = './test-content/00.txt'
     var expectedFile ='./test-content/00-ucase.txt'
     var expectedResult = readFileSync(expectedFile).toString()
@@ -29,13 +30,12 @@ describe('file convert handler test', () => {
       getTempPath
     }
 
-    return Promise.all([
-      fileConvertHandler.loadHandler(config),
-      fileStreamable(testFile)
-    ]).then(([handler, inputStreamable]) =>
-      handler({}, inputStreamable).then(streamableToText)
-      .then(result => {
-        result.should.equal(expectedResult)
-      }))
-  })
+    var fileConvertHandler = makeFileConvertHandler()
+
+    var handler = yield fileConvertHandler.loadHandler(config)
+    var streamable = yield fileStreamable(testFile)
+
+    yield handler({}, streamable).then(streamableToText)
+      .should.eventually.equal(expectedResult)
+  }))
 })
