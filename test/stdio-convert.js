@@ -1,11 +1,12 @@
 import 'traceur'
+
 import { readFileSync } from 'fs'
 import { async } from 'quiver-promise'
 import { fileStreamable } from 'quiver-file-stream'
 import { streamableToText } from 'quiver-stream-util'
 import { loadStreamHandler } from 'quiver-component'
 
-import { makeStdioConvertHandler } from '../lib/stdio-convert.js'
+import { makeCommandHandler } from '../lib/command-handler.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -22,11 +23,10 @@ describe('stdio convert test', () => {
     var getCommandArgs = args =>
       ['grep', 'IPSUM']
 
-    var config = { getCommandArgs }
+    var stdioConvertHandler = makeCommandHandler(
+      getCommandArgs, 'pipe', 'pipe')
 
-    var stdioConvertHandler = makeStdioConvertHandler()
-
-    var handler = yield loadStreamHandler(config, stdioConvertHandler)
+    var handler = yield loadStreamHandler({ }, stdioConvertHandler)
     var streamable = yield fileStreamable(testFile)
 
     yield handler({}, streamable).then(streamableToText)

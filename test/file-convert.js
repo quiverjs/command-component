@@ -1,10 +1,11 @@
 import 'traceur'
+
 import { readFileSync } from 'fs'
 import { async } from 'quiver-promise'
 import { fileStreamable } from 'quiver-file-stream'
 import { streamableToText } from 'quiver-stream-util'
 
-import { makeFileConvertHandler } from '../lib/file-convert.js'
+import { makeCommandHandler } from '../lib/command-handler.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -13,24 +14,24 @@ chai.use(chaiAsPromised)
 var should = chai.should()
 
 describe('file convert handler test', () => {
-  it('basic test', async(function*() {
+  it.only('basic test', async(function*() {
     var testFile = './test-content/00.txt'
     var expectedFile ='./test-content/00-ucase.txt'
     var expectedResult = readFileSync(expectedFile).toString()
 
-    var getCommandArgs = (args, inPath, outPath) =>
-      ['dd', 'if='+inPath, 'of='+outPath, 'conv=ucase']
+    var getCommandArgs = ({inputFile, outputFile}) =>
+      ['dd', 'if='+inputFile, 'of='+outputFile, 'conv=ucase']
 
-    var getTempPath = () =>
+    var tempPathBuilder = () =>
       './test-content/temp/' + (new Date()).getTime() 
         + '-' + (Math.random()*10000|0) + '.tmp'
 
     var config = {
-      getCommandArgs,
-      getTempPath
+      tempPathBuilder
     }
 
-    var fileConvertHandler = makeFileConvertHandler()
+    var fileConvertHandler = makeCommandHandler(
+      getCommandArgs, 'file', 'file')
 
     var handler = yield fileConvertHandler.loadHandler(config)
     var streamable = yield fileStreamable(testFile)

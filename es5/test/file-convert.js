@@ -4,18 +4,18 @@ var readFileSync = $traceurRuntime.assertObject(require('fs')).readFileSync;
 var async = $traceurRuntime.assertObject(require('quiver-promise')).async;
 var fileStreamable = $traceurRuntime.assertObject(require('quiver-file-stream')).fileStreamable;
 var streamableToText = $traceurRuntime.assertObject(require('quiver-stream-util')).streamableToText;
-var makeFileConvertHandler = $traceurRuntime.assertObject(require('../lib/file-convert.js')).makeFileConvertHandler;
+var makeCommandHandler = $traceurRuntime.assertObject(require('../lib/command-handler.js')).makeCommandHandler;
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 var should = chai.should();
 describe('file convert handler test', (function() {
-  it('basic test', async($traceurRuntime.initGeneratorFunction(function $__1() {
+  it.only('basic test', async($traceurRuntime.initGeneratorFunction(function $__1() {
     var testFile,
         expectedFile,
         expectedResult,
         getCommandArgs,
-        getTempPath,
+        tempPathBuilder,
         config,
         fileConvertHandler,
         handler,
@@ -27,17 +27,16 @@ describe('file convert handler test', (function() {
             testFile = './test-content/00.txt';
             expectedFile = './test-content/00-ucase.txt';
             expectedResult = readFileSync(expectedFile).toString();
-            getCommandArgs = (function(args, inPath, outPath) {
-              return ['dd', 'if=' + inPath, 'of=' + outPath, 'conv=ucase'];
+            getCommandArgs = (function($__0) {
+              var inputFile = $__0.inputFile,
+                  outputFile = $__0.outputFile;
+              return ['dd', 'if=' + inputFile, 'of=' + outputFile, 'conv=ucase'];
             });
-            getTempPath = (function() {
+            tempPathBuilder = (function() {
               return './test-content/temp/' + (new Date()).getTime() + '-' + (Math.random() * 10000 | 0) + '.tmp';
             });
-            config = {
-              getCommandArgs: getCommandArgs,
-              getTempPath: getTempPath
-            };
-            fileConvertHandler = makeFileConvertHandler();
+            config = {tempPathBuilder: tempPathBuilder};
+            fileConvertHandler = makeCommandHandler(getCommandArgs, 'file', 'file');
             $ctx.state = 14;
             break;
           case 14:

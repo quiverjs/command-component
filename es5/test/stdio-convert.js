@@ -5,7 +5,7 @@ var async = $traceurRuntime.assertObject(require('quiver-promise')).async;
 var fileStreamable = $traceurRuntime.assertObject(require('quiver-file-stream')).fileStreamable;
 var streamableToText = $traceurRuntime.assertObject(require('quiver-stream-util')).streamableToText;
 var loadStreamHandler = $traceurRuntime.assertObject(require('quiver-component')).loadStreamHandler;
-var makeStdioConvertHandler = $traceurRuntime.assertObject(require('../lib/stdio-convert.js')).makeStdioConvertHandler;
+var makeCommandHandler = $traceurRuntime.assertObject(require('../lib/command-handler.js')).makeCommandHandler;
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
@@ -16,7 +16,6 @@ describe('stdio convert test', (function() {
         expectedFile,
         expectedResult,
         getCommandArgs,
-        config,
         stdioConvertHandler,
         handler,
         streamable;
@@ -30,13 +29,12 @@ describe('stdio convert test', (function() {
             getCommandArgs = (function(args) {
               return ['grep', 'IPSUM'];
             });
-            config = {getCommandArgs: getCommandArgs};
-            stdioConvertHandler = makeStdioConvertHandler();
+            stdioConvertHandler = makeCommandHandler(getCommandArgs, 'pipe', 'pipe');
             $ctx.state = 14;
             break;
           case 14:
             $ctx.state = 2;
-            return loadStreamHandler(config, stdioConvertHandler);
+            return loadStreamHandler({}, stdioConvertHandler);
           case 2:
             handler = $ctx.sent;
             $ctx.state = 4;
