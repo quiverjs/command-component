@@ -5,8 +5,10 @@ Object.defineProperties(exports, {
     }},
   __esModule: {value: true}
 });
-var error = $traceurRuntime.assertObject(require('quiver-error')).error;
-var createPromise = $traceurRuntime.assertObject(require('quiver-promise')).createPromise;
+var $__quiver_45_error__,
+    $__quiver_45_promise__;
+var error = ($__quiver_45_error__ = require("quiver-error"), $__quiver_45_error__ && $__quiver_45_error__.__esModule && $__quiver_45_error__ || {default: $__quiver_45_error__}).error;
+var createPromise = ($__quiver_45_promise__ = require("quiver-promise"), $__quiver_45_promise__ && $__quiver_45_promise__.__esModule && $__quiver_45_promise__ || {default: $__quiver_45_promise__}).createPromise;
 var awaitProcess = (function(process) {
   var timeout = arguments[1] !== (void 0) ? arguments[1] : -1;
   return createPromise((function(resolve, reject) {

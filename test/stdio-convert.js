@@ -1,10 +1,12 @@
 import 'traceur'
 
-import { readFileSync } from 'fs'
 import { async } from 'quiver-promise'
 import { fileStreamable } from 'quiver-file-stream'
 import { streamableToText } from 'quiver-stream-util'
 import { loadStreamHandler } from 'quiver-component'
+
+import fs from 'fs'
+var { readFileSync } = fs
 
 import { makeCommandHandler } from '../lib/command-handler.js'
 

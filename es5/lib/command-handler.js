@@ -5,27 +5,41 @@ Object.defineProperties(exports, {
     }},
   __esModule: {value: true}
 });
-var unlink = $traceurRuntime.assertObject(require('fs')).unlink;
-var error = $traceurRuntime.assertObject(require('quiver-error')).error;
-var tempPath = $traceurRuntime.assertObject(require('temp')).path;
-var $__0 = $traceurRuntime.assertObject(require('quiver-promise')),
-    async = $__0.async,
-    createPromise = $__0.createPromise;
-var spawnProcess = $traceurRuntime.assertObject(require('child_process')).spawn;
-var streamHandlerBuilder = $traceurRuntime.assertObject(require('quiver-component')).streamHandlerBuilder;
-var $__0 = $traceurRuntime.assertObject(require('quiver-stream-util')),
-    reuseStream = $__0.reuseStream,
-    streamableToText = $__0.streamableToText,
-    pipeStream = $__0.pipeStream,
-    nodeToQuiverReadStream = $__0.nodeToQuiverReadStream,
-    nodeToQuiverWriteStream = $__0.nodeToQuiverWriteStream;
-var $__0 = $traceurRuntime.assertObject(require('quiver-file-stream')),
-    toFileStreamable = $__0.toFileStreamable,
-    tempFileStreamable = $__0.tempFileStreamable;
-var awaitProcess = $traceurRuntime.assertObject(require('./await.js')).awaitProcess;
+var $__quiver_45_error__,
+    $__quiver_45_promise__,
+    $__quiver_45_component__,
+    $__fs__,
+    $__temp__,
+    $__child_95_process__,
+    $__quiver_45_stream_45_util__,
+    $__quiver_45_file_45_stream__,
+    $__await_46_js__;
+var error = ($__quiver_45_error__ = require("quiver-error"), $__quiver_45_error__ && $__quiver_45_error__.__esModule && $__quiver_45_error__ || {default: $__quiver_45_error__}).error;
+var $__1 = ($__quiver_45_promise__ = require("quiver-promise"), $__quiver_45_promise__ && $__quiver_45_promise__.__esModule && $__quiver_45_promise__ || {default: $__quiver_45_promise__}),
+    async = $__1.async,
+    createPromise = $__1.createPromise;
+var streamHandlerBuilder = ($__quiver_45_component__ = require("quiver-component"), $__quiver_45_component__ && $__quiver_45_component__.__esModule && $__quiver_45_component__ || {default: $__quiver_45_component__}).streamHandlerBuilder;
+var fs = ($__fs__ = require("fs"), $__fs__ && $__fs__.__esModule && $__fs__ || {default: $__fs__}).default;
+var unlink = fs.unlink;
+var tempLib = ($__temp__ = require("temp"), $__temp__ && $__temp__.__esModule && $__temp__ || {default: $__temp__}).default;
+var tempPath = tempLib.path;
+var childProcess = ($__child_95_process__ = require("child_process"), $__child_95_process__ && $__child_95_process__.__esModule && $__child_95_process__ || {default: $__child_95_process__}).default;
+var spawnProcess = childProcess.spawn;
+var $__6 = ($__quiver_45_stream_45_util__ = require("quiver-stream-util"), $__quiver_45_stream_45_util__ && $__quiver_45_stream_45_util__.__esModule && $__quiver_45_stream_45_util__ || {default: $__quiver_45_stream_45_util__}),
+    reuseStream = $__6.reuseStream,
+    streamableToText = $__6.streamableToText,
+    pipeStream = $__6.pipeStream,
+    emptyStreamable = $__6.emptyStreamable,
+    nodeToQuiverReadStream = $__6.nodeToQuiverReadStream,
+    nodeToQuiverWriteStream = $__6.nodeToQuiverWriteStream;
+var $__7 = ($__quiver_45_file_45_stream__ = require("quiver-file-stream"), $__quiver_45_file_45_stream__ && $__quiver_45_file_45_stream__.__esModule && $__quiver_45_file_45_stream__ || {default: $__quiver_45_file_45_stream__}),
+    toFileStreamable = $__7.toFileStreamable,
+    tempFileStreamable = $__7.tempFileStreamable;
+var awaitProcess = ($__await_46_js__ = require("./await.js"), $__await_46_js__ && $__await_46_js__.__esModule && $__await_46_js__ || {default: $__await_46_js__}).awaitProcess;
 var validModes = {
   'file': true,
-  'pipe': true
+  'pipe': true,
+  'ignore': true
 };
 var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
   if (typeof(cmdArgsExtractor) != 'function')
@@ -33,13 +47,17 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
   if (!validModes[$traceurRuntime.toProperty(inputMode)] || !validModes[$traceurRuntime.toProperty(outputMode)])
     throw new Error('invalid input/output mode');
   var inputFileMode = inputMode == 'file';
+  var inputPipeMode = inputMode == 'pipe';
+  var inputIgnoreMode = inputMode == 'ignore';
   var outputFileMode = outputMode == 'file';
+  var outputPipeMode = outputMode == 'pipe';
+  var outputIgnoreMode = outputMode == 'ignore';
   return streamHandlerBuilder((function(config) {
-    var $__1;
-    var $__0 = $traceurRuntime.assertObject(config),
-        tempPathBuilder = ($__1 = $__0.tempPathBuilder) === void 0 ? tempPath : $__1,
-        commandTimeout = $__0.commandTimeout;
-    return async($traceurRuntime.initGeneratorFunction(function $__2(args, inputStreamable) {
+    var $__10;
+    var $__9 = config,
+        tempPathBuilder = ($__10 = $__9.tempPathBuilder) === void 0 ? tempPath : $__10,
+        commandTimeout = $__9.commandTimeout;
+    return async($traceurRuntime.initGeneratorFunction(function $__11(args, inputStreamable) {
       var fileStreamable,
           inputIsTemp,
           outPath,
@@ -50,8 +68,8 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
           stdoutStreamable,
           stderrStreamable,
           message,
-          $__3,
-          $__4,
+          $__12,
+          $__13,
           err;
       return $traceurRuntime.createGeneratorInstance(function($ctx) {
         while (true)
@@ -81,19 +99,19 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
               $ctx.state = (outputFileMode) ? 16 : 19;
               break;
             case 16:
-              $__3 = tempPathBuilder();
+              $__12 = tempPathBuilder();
               $ctx.state = 17;
               break;
             case 17:
               $ctx.state = 13;
-              return $__3;
+              return $__12;
             case 13:
-              $__4 = $ctx.sent;
+              $__13 = $ctx.sent;
               $ctx.state = 15;
               break;
             case 15:
-              args.outputFile = $__4;
-              outPath = $__4;
+              args.outputFile = $__13;
+              outPath = $__13;
               $ctx.state = 19;
               break;
             case 19:
@@ -105,10 +123,10 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
               break;
             case 24:
               command = spawnProcess(commandArgs[0], commandArgs.slice(1));
-              $ctx.state = 73;
+              $ctx.state = 82;
               break;
-            case 73:
-              $ctx.state = (inputFileMode) ? 31 : 25;
+            case 82:
+              $ctx.state = (inputFileMode || inputIgnoreMode) ? 31 : 25;
               break;
             case 31:
               command.stdin.end();
@@ -127,7 +145,7 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
               $ctx.state = 32;
               break;
             case 32:
-              $ctx.state = (outputFileMode) ? 48 : 69;
+              $ctx.state = (outputFileMode) ? 48 : 79;
               break;
             case 48:
               command.stdout.resume();
@@ -158,6 +176,9 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
             case 37:
               $ctx.returnValue = tempFileStreamable(outPath);
               $ctx.state = -2;
+              break;
+            case 79:
+              $ctx.state = (outputPipeMode) ? 69 : 77;
               break;
             case 69:
               stdoutStreamable = reuseStream(nodeToQuiverReadStream(command.stdout));
@@ -199,13 +220,29 @@ var makeCommandHandler = (function(cmdArgsExtractor, inputMode, outputMode) {
               $ctx.returnValue = stdoutStreamable;
               $ctx.state = -2;
               break;
+            case 77:
+              command.stdout.resume();
+              command.stderr.resume();
+              $ctx.state = 78;
+              break;
+            case 78:
+              $ctx.state = 72;
+              return awaitProcess(command, commandTimeout);
+            case 72:
+              $ctx.maybeThrow();
+              $ctx.state = 74;
+              break;
+            case 74:
+              $ctx.returnValue = emptyStreamable();
+              $ctx.state = -2;
+              break;
             case 43:
               $ctx.state = $ctx.finallyFallThrough;
               break;
             default:
               return $ctx.end();
           }
-      }, $__2, this);
+      }, $__11, this);
     }));
   }));
 });
