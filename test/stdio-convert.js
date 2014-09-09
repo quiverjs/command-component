@@ -8,7 +8,7 @@ import { loadStreamHandler } from 'quiver-component'
 import fs from 'fs'
 var { readFileSync } = fs
 
-import { makeCommandHandler } from '../lib/command-handler.js'
+import { commandHandler } from '../lib/command-component.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -25,7 +25,7 @@ describe('stdio convert test', () => {
     var getCommandArgs = args =>
       ['grep', 'IPSUM']
 
-    var stdioConvertHandler = makeCommandHandler(
+    var stdioConvertHandler = commandHandler(
       getCommandArgs, 'pipe', 'pipe')
 
     var handler = yield loadStreamHandler({ }, stdioConvertHandler)

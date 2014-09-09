@@ -6,7 +6,7 @@
   },
   "name": "quiver-command-component",
   "desription": "Quiver components that wrap around command line",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "homepage": "https://github.com/quiverjs/command-component",
   "repository": {
     "url": "git@github.com:quiverjs/command-component.git"
@@ -17,7 +17,7 @@
     "quiver-error": "~0.1.1",
     "quiver-promise": "~0.1.0",
     "quiver-component": "~1.1.0",
-    "quiver-file-stream": "~1.1.0",
+    "quiver-file-stream": "~1.1.1",
     "quiver-stream-util": "~1.1.0"
   },
   "devDependencies": {

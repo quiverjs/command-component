@@ -7,7 +7,7 @@ import { streamableToText } from 'quiver-stream-util'
 import fs from 'fs'
 var { readFileSync } = fs
 
-import { makeCommandHandler } from '../lib/command-handler.js'
+import { commandHandler } from '../lib/command-component.js'
 
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
@@ -16,7 +16,7 @@ chai.use(chaiAsPromised)
 var should = chai.should()
 
 describe('file convert handler test', () => {
-  it.only('basic test', async(function*() {
+  it('basic test', async(function*() {
     var testFile = './test-content/00.txt'
     var expectedFile ='./test-content/00-ucase.txt'
     var expectedResult = readFileSync(expectedFile).toString()
@@ -32,7 +32,7 @@ describe('file convert handler test', () => {
       tempPathBuilder
     }
 
-    var fileConvertHandler = makeCommandHandler(
+    var fileConvertHandler = commandHandler(
       getCommandArgs, 'file', 'file')
 
     var handler = yield fileConvertHandler.loadHandler(config)

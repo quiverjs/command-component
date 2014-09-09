@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperties(exports, {
-  makeCommandHandler: {get: function() {
+  commandHandler: {get: function() {
       return makeCommandHandler;
     }},
   __esModule: {value: true}
