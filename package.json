@@ -7,9 +7,9 @@
   "name": "quiver-command-component",
   "desription": "Quiver components that wrap around command line",
   "version": "1.2.0",
-  "homepage": "https://github.com/quiverjs/command-component",
+  "homepage": "https://github.com/quiverjs/quiver-command-component",
   "repository": {
-    "url": "git@github.com:quiverjs/command-component.git"
+    "url": "git@github.com:quiverjs/quiver-command-component.git"
   },
   "dependencies": {
     "temp": "~0.8.1",
@@ -21,8 +21,7 @@
     "chai-as-promised": "^4.1.1"
   },
   "bugs": {
-    "url": "https://github.com/quiverjs/command-component/issues",
-    "email": "quiverjs@soareschen.com"
+    "url": "https://github.com/quiverjs/quiver-command-component/issues"
   },
   "licenses": {
     "type": "MIT",
