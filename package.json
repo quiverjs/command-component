@@ -13,12 +13,11 @@
   },
   "dependencies": {
     "temp": "~0.8.1",
-    "traceur": "~0.0.60",
     "quiver-core": "~1.1.0"
   },
   "devDependencies": {
-    "chai": "^1.9.1",
-    "mocha": "^1.21.4",
+    "chai": "^1.10.0",
+    "mocha": "^2.0.1",
     "chai-as-promised": "^4.1.1"
   },
   "bugs": {
