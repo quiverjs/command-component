@@ -6,25 +6,19 @@
   },
   "name": "quiver-command-component",
   "desription": "Quiver components that wrap around command line",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "homepage": "https://github.com/quiverjs/command-component",
   "repository": {
     "url": "git@github.com:quiverjs/command-component.git"
   },
   "dependencies": {
-    "temp": "^0.8.0",
+    "temp": "~0.8.1",
     "traceur": "~0.0.60",
-    "quiver-error": "~0.1.1",
-    "quiver-promise": "~0.1.0",
-    "quiver-component": "~1.1.0",
-    "quiver-file-stream": "~1.1.1",
-    "quiver-stream-util": "~1.1.0"
+    "quiver-core": "~1.1.0"
   },
   "devDependencies": {
     "chai": "^1.9.1",
-    "gulp": "^3.8.7",
     "mocha": "^1.21.4",
-    "gulp-traceur": "^0.13.0",
     "chai-as-promised": "^4.1.1"
   },
   "bugs": {
@@ -37,6 +31,12 @@
   },
   "main": "./lib/command-component",
   "scripts": {
-    "test": "make test"
+    "test": "mocha es5/test",
+    "pretest": "npm run build && npm run clear-temp",
+    "prepublish": "npm run build",
+    "clear-temp": "rm -rf temp/ && mkdir temp",
+    "build": "npm run build-lib && npm run build-test",
+    "build-lib": "traceur --dir lib es5/lib --modules commonjs",
+    "build-test": "traceur --dir test es5/test --modules commonjs"
   }
 }

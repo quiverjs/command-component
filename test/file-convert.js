@@ -1,16 +1,16 @@
-import 'traceur'
+import 'quiver-core/traceur'
 
-import { async } from 'quiver-promise'
-import { fileStreamable } from 'quiver-file-stream'
-import { streamableToText } from 'quiver-stream-util'
+import { async } from 'quiver-core/promise'
+import { fileStreamable } from 'quiver-core/file-stream'
+import { streamableToText } from 'quiver-core/stream-util'
 
 import fs from 'fs'
 var { readFileSync } = fs
 
 import { commandHandler } from '../lib/command-component.js'
 
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 
 chai.use(chaiAsPromised)
 var should = chai.should()
@@ -32,8 +32,12 @@ describe('file convert handler test', () => {
       tempPathBuilder
     }
 
-    var fileConvertHandler = commandHandler(
-      getCommandArgs, 'file', 'file')
+    var fileConvertHandler = commandHandler()
+      .configOverride({
+        cmdArgsExtractor: getCommandArgs,
+        inputMode: 'file',
+        outputMode: 'file'
+      })
 
     var handler = yield fileConvertHandler.loadHandler(config)
     var streamable = yield fileStreamable(testFile)

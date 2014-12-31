@@ -1,23 +1,25 @@
 "use strict";
-var $__traceur_64_0_46_0_46_58__,
-    $__quiver_45_promise__,
-    $__quiver_45_file_45_stream__,
-    $__quiver_45_stream_45_util__,
+var $__quiver_45_core_47_traceur__,
+    $__quiver_45_core_47_promise__,
+    $__quiver_45_core_47_file_45_stream__,
+    $__quiver_45_core_47_stream_45_util__,
     $__fs__,
-    $___46__46__47_lib_47_command_45_component_46_js__;
-($__traceur_64_0_46_0_46_58__ = require("traceur"), $__traceur_64_0_46_0_46_58__ && $__traceur_64_0_46_0_46_58__.__esModule && $__traceur_64_0_46_0_46_58__ || {default: $__traceur_64_0_46_0_46_58__});
-var async = ($__quiver_45_promise__ = require("quiver-promise"), $__quiver_45_promise__ && $__quiver_45_promise__.__esModule && $__quiver_45_promise__ || {default: $__quiver_45_promise__}).async;
-var fileStreamable = ($__quiver_45_file_45_stream__ = require("quiver-file-stream"), $__quiver_45_file_45_stream__ && $__quiver_45_file_45_stream__.__esModule && $__quiver_45_file_45_stream__ || {default: $__quiver_45_file_45_stream__}).fileStreamable;
-var streamableToText = ($__quiver_45_stream_45_util__ = require("quiver-stream-util"), $__quiver_45_stream_45_util__ && $__quiver_45_stream_45_util__.__esModule && $__quiver_45_stream_45_util__ || {default: $__quiver_45_stream_45_util__}).streamableToText;
+    $___46__46__47_lib_47_command_45_component_46_js__,
+    $__chai__,
+    $__chai_45_as_45_promised__;
+($__quiver_45_core_47_traceur__ = require("quiver-core/traceur"), $__quiver_45_core_47_traceur__ && $__quiver_45_core_47_traceur__.__esModule && $__quiver_45_core_47_traceur__ || {default: $__quiver_45_core_47_traceur__});
+var async = ($__quiver_45_core_47_promise__ = require("quiver-core/promise"), $__quiver_45_core_47_promise__ && $__quiver_45_core_47_promise__.__esModule && $__quiver_45_core_47_promise__ || {default: $__quiver_45_core_47_promise__}).async;
+var fileStreamable = ($__quiver_45_core_47_file_45_stream__ = require("quiver-core/file-stream"), $__quiver_45_core_47_file_45_stream__ && $__quiver_45_core_47_file_45_stream__.__esModule && $__quiver_45_core_47_file_45_stream__ || {default: $__quiver_45_core_47_file_45_stream__}).fileStreamable;
+var streamableToText = ($__quiver_45_core_47_stream_45_util__ = require("quiver-core/stream-util"), $__quiver_45_core_47_stream_45_util__ && $__quiver_45_core_47_stream_45_util__.__esModule && $__quiver_45_core_47_stream_45_util__ || {default: $__quiver_45_core_47_stream_45_util__}).streamableToText;
 var fs = ($__fs__ = require("fs"), $__fs__ && $__fs__.__esModule && $__fs__ || {default: $__fs__}).default;
 var readFileSync = fs.readFileSync;
 var commandHandler = ($___46__46__47_lib_47_command_45_component_46_js__ = require("../lib/command-component.js"), $___46__46__47_lib_47_command_45_component_46_js__ && $___46__46__47_lib_47_command_45_component_46_js__.__esModule && $___46__46__47_lib_47_command_45_component_46_js__ || {default: $___46__46__47_lib_47_command_45_component_46_js__}).commandHandler;
-var chai = require('chai');
-var chaiAsPromised = require('chai-as-promised');
+var chai = ($__chai__ = require("chai"), $__chai__ && $__chai__.__esModule && $__chai__ || {default: $__chai__}).default;
+var chaiAsPromised = ($__chai_45_as_45_promised__ = require("chai-as-promised"), $__chai_45_as_45_promised__ && $__chai_45_as_45_promised__.__esModule && $__chai_45_as_45_promised__ || {default: $__chai_45_as_45_promised__}).default;
 chai.use(chaiAsPromised);
 var should = chai.should();
 describe('file convert handler test', (function() {
-  it('basic test', async($traceurRuntime.initGeneratorFunction(function $__7() {
+  it('basic test', async($traceurRuntime.initGeneratorFunction(function $__10() {
     var testFile,
         expectedFile,
         expectedResult,
@@ -34,17 +36,21 @@ describe('file convert handler test', (function() {
             testFile = './test-content/00.txt';
             expectedFile = './test-content/00-ucase.txt';
             expectedResult = readFileSync(expectedFile).toString();
-            getCommandArgs = (function($__5) {
-              var $__6 = $__5,
-                  inputFile = $__6.inputFile,
-                  outputFile = $__6.outputFile;
+            getCommandArgs = (function($__8) {
+              var $__9 = $__8,
+                  inputFile = $__9.inputFile,
+                  outputFile = $__9.outputFile;
               return ['dd', 'if=' + inputFile, 'of=' + outputFile, 'conv=ucase'];
             });
             tempPathBuilder = (function() {
               return './test-content/temp/' + (new Date()).getTime() + '-' + (Math.random() * 10000 | 0) + '.tmp';
             });
             config = {tempPathBuilder: tempPathBuilder};
-            fileConvertHandler = commandHandler(getCommandArgs, 'file', 'file');
+            fileConvertHandler = commandHandler().configOverride({
+              cmdArgsExtractor: getCommandArgs,
+              inputMode: 'file',
+              outputMode: 'file'
+            });
             $ctx.state = 14;
             break;
           case 14:
@@ -71,6 +77,6 @@ describe('file convert handler test', (function() {
           default:
             return $ctx.end();
         }
-    }, $__7, this);
+    }, $__10, this);
   })));
 }));
