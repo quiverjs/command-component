@@ -1,5 +1,3 @@
 'use strict'
-
 var traceur = require('traceur')
-
-module.exports = require('./es5/lib/command-component.js')
+module.exports = require('./out/lib/command-component.js')

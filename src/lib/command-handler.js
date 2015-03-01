@@ -3,13 +3,13 @@ import { async, createPromise } from 'quiver-core/promise'
 import { streamHandlerBuilder } from 'quiver-core/component'
 
 import fs from 'fs'
-var { unlink } = fs
+let { unlink } = fs
 
 import tempLib from 'temp'
-var { path: tempPath } = tempLib
+let { path: tempPath } = tempLib
 
 import childProcess from 'child_process'
-var { spawn: spawnProcess } = childProcess
+let { spawn: spawnProcess } = childProcess
 
 import { 
   reuseStream, streamableToText, 
@@ -24,15 +24,15 @@ import {
 
 import { awaitProcess } from './await.js'
 
-var validModes = {
+let validModes = {
   'file': true,
   'pipe': true,
   'ignore': true
 }
 
-export var commandHandler = streamHandlerBuilder(
+export let commandHandler = streamHandlerBuilder(
 config => {
-  var { 
+  let { 
     cmdArgsExtractor, inputMode, outputMode,
     commandTimeout, tempPathBuilder=tempPath,
   } = config
@@ -43,38 +43,41 @@ config => {
   if(!validModes[inputMode] || !validModes[outputMode])
     throw new Error('invalid input/output mode')
 
-  var inputFileMode = (inputMode == 'file')
-  var inputPipeMode = (inputMode == 'pipe')
-  var inputIgnoreMode = (inputMode == 'ignore')
+  let inputFileMode = (inputMode == 'file')
+  let inputPipeMode = (inputMode == 'pipe')
+  let inputIgnoreMode = (inputMode == 'ignore')
 
-  var outputFileMode = (outputMode == 'file')
-  var outputPipeMode = (outputMode == 'pipe')
-  var outputIgnoreMode = (outputMode == 'ignore')
+  let outputFileMode = (outputMode == 'file')
+  let outputPipeMode = (outputMode == 'pipe')
+  let outputIgnoreMode = (outputMode == 'ignore')
 
   return async(function*(args, inputStreamable) {
+    let inputIsTemp = false
+
     if(inputFileMode) {
-      var fileStreamable = yield toFileStreamable(
+      let fileStreamable = yield toFileStreamable(
         inputStreamable, tempPathBuilder)
 
-      var inputIsTemp = fileStreamable.tempFile
+      inputIsTemp = fileStreamable.tempFile
 
       args.inputFile = yield fileStreamable.toFilePath()
     }
 
+    let outPath = null
     if(outputFileMode) {
-      var outPath = args.outputFile = yield tempPathBuilder()
+      outPath = args.outputFile = yield tempPathBuilder()
     }
 
-    var commandArgs = yield cmdArgsExtractor(args)
+    let commandArgs = yield cmdArgsExtractor(args)
 
-    var command = spawnProcess(commandArgs[0], 
+    let command = spawnProcess(commandArgs[0], 
       commandArgs.slice(1))
 
     if(inputFileMode || inputIgnoreMode) {
       command.stdin.end()
     } else {
-      var inputStream = yield inputStreamable.toStream()
-      var stdinStream = nodeToQuiverWriteStream(command.stdin)
+      let inputStream = yield inputStreamable.toStream()
+      let stdinStream = nodeToQuiverWriteStream(command.stdin)
       pipeStream(inputStream, stdinStream)
     }
 
@@ -91,16 +94,16 @@ config => {
       return tempFileStreamable(outPath)
 
     } else if(outputPipeMode) {
-      var stdoutStreamable = reuseStream(
+      let stdoutStreamable = reuseStream(
         nodeToQuiverReadStream(command.stdout))
 
-      var stderrStreamable = reuseStream(
+      let stderrStreamable = reuseStream(
         nodeToQuiverReadStream(command.stderr))
 
       try {
         yield awaitProcess(command, commandTimeout)
       } catch(err) {
-        var message = yield streamableToText(stderrStreamable)
+        let message = yield streamableToText(stderrStreamable)
         throw error(500, 'error executing command: ' + message)
       }
 
@@ -115,4 +118,4 @@ config => {
   })
 })
 
-export var makeCommandHandler = commandHandler.factory()
+export let makeCommandHandler = commandHandler.factory()

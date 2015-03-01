@@ -1,5 +1,5 @@
-export var logProcessIO = (stdioLogger, childProcess, commandArgs) => {
-  var logger = stdioLogger.newLog(commandArgs)
+export let logProcessIO = (stdioLogger, childProcess, commandArgs) => {
+  let logger = stdioLogger.newLog(commandArgs)
 
   childProcess.stdout.on('data', 
     data => logger.stdout(data))

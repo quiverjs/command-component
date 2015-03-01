@@ -1,9 +1,9 @@
 import { error } from 'quiver-core/error'
 import { createPromise } from 'quiver-core/promise'
 
-export var awaitProcess = (process, timeout=-1) =>
+export let awaitProcess = (process, timeout=-1) =>
   createPromise((resolve, reject) => {
-    var processExited = false
+    let processExited = false
 
     process.on('exit', code => {
       if(processExited) return
