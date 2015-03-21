@@ -3,7 +3,7 @@ import { fileStreamable } from 'quiver-core/file-stream'
 import { streamableToText } from 'quiver-core/stream-util'
 
 import fs from 'fs'
-let { readFileSync } = fs
+const { readFileSync } = fs
 
 import { commandHandler } from '../lib/command-component.js'
 
@@ -11,34 +11,34 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
 chai.use(chaiAsPromised)
-let should = chai.should()
+const should = chai.should()
 
 describe('file convert handler test', () => {
   it('basic test', async(function*() {
-    let testFile = './test-content/00.txt'
-    let expectedFile ='./test-content/00-ucase.txt'
-    let expectedResult = readFileSync(expectedFile).toString()
+    const testFile = './test-content/00.txt'
+    const expectedFile ='./test-content/00-ucase.txt'
+    const expectedResult = readFileSync(expectedFile).toString()
 
-    let getCommandArgs = ({inputFile, outputFile}) =>
+    const getCommandArgs = ({inputFile, outputFile}) =>
       ['dd', 'if='+inputFile, 'of='+outputFile, 'conv=ucase']
 
-    let tempPathBuilder = () =>
+    const tempPathBuilder = () =>
       './test-content/temp/' + (new Date()).getTime() 
         + '-' + (Math.random()*10000|0) + '.tmp'
 
-    let config = {
+    const config = {
       tempPathBuilder
     }
 
-    let fileConvertHandler = commandHandler()
+    const fileConvertHandler = commandHandler()
       .configOverride({
         cmdArgsExtractor: getCommandArgs,
         inputMode: 'file',
         outputMode: 'file'
       })
 
-    let handler = yield fileConvertHandler.loadHandler(config)
-    let streamable = yield fileStreamable(testFile)
+    const handler = yield fileConvertHandler.loadHandler(config)
+    const streamable = yield fileStreamable(testFile)
 
     yield handler({}, streamable).then(streamableToText)
       .should.eventually.equal(expectedResult)
