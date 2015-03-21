@@ -1,5 +1,3 @@
-import 'quiver-core/traceur'
-
 import { async } from 'quiver-core/promise'
 import { fileStreamable } from 'quiver-core/file-stream'
 import { streamableToText } from 'quiver-core/stream-util'
