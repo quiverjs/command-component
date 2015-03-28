@@ -1,5 +1,5 @@
-import { error } from 'quiver-core/error'
-import { createPromise } from 'quiver-core/promise'
+import { error } from 'quiver/error'
+import { createPromise } from 'quiver/promise'
 
 export const awaitProcess = (process, timeout=-1) =>
   createPromise((resolve, reject) => {

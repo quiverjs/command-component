@@ -1,7 +1,7 @@
-import { async } from 'quiver-core/promise'
-import { fileStreamable } from 'quiver-core/file-stream'
-import { streamableToText } from 'quiver-core/stream-util'
-import { loadStreamHandler } from 'quiver-core/component'
+import { async } from 'quiver/promise'
+import { fileStreamable } from 'quiver/file-stream'
+import { streamableToText } from 'quiver/stream-util'
+import { loadStreamHandler } from 'quiver/component'
 
 import fs from 'fs'
 const { readFileSync } = fs

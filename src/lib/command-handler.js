@@ -1,6 +1,6 @@
-import { error } from 'quiver-core/error'
-import { async, createPromise } from 'quiver-core/promise'
-import { streamHandlerBuilder } from 'quiver-core/component'
+import { error } from 'quiver/error'
+import { async, createPromise } from 'quiver/promise'
+import { streamHandlerBuilder } from 'quiver/component'
 
 import fs from 'fs'
 const { unlink } = fs
@@ -16,11 +16,11 @@ import {
   pipeStream, emptyStreamable,
   nodeToQuiverReadStream, 
   nodeToQuiverWriteStream 
-} from 'quiver-core/stream-util'
+} from 'quiver/stream-util'
 
 import { 
   toFileStreamable, tempFileStreamable 
-} from 'quiver-core/file-stream'
+} from 'quiver/file-stream'
 
 import { awaitProcess } from './await.js'
 
