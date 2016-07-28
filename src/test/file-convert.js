@@ -14,7 +14,7 @@ import {
   createConfig as Config
 } from 'quiver-core/component/util'
 
-import { simpleCommandHandler } from '../lib'
+import { simpleCommandHandler } from '../lib/constructor'
 
 const readFile = promisify(fs.readFile)
 

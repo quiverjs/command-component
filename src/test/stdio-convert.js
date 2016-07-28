@@ -13,7 +13,7 @@ import {
   createConfig as Config
 } from 'quiver-core/component/util'
 
-import { simpleCommandHandler } from '../lib'
+import { simpleCommandHandler } from '../lib/constructor'
 
 const readFile = promisify(fs.readFile)
 
@@ -28,8 +28,8 @@ test('stdio convert test', assert => {
 
     const stdioConvertHandler = simpleCommandHandler({
       commandArgsExtractor: getCommandArgs,
-      inputMode: 'pipe',
-      outputMode: 'pipe'
+      inputMode: 'stream',
+      outputMode: 'stream'
     })
 
     const handler = await loadHandler(Config(), stdioConvertHandler)

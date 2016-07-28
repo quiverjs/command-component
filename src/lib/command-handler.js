@@ -22,7 +22,7 @@ import { streamHandlerBuilder } from 'quiver-core/component/constructor'
 
 import { awaitProcess } from './await'
 
-const validModes = new Set(['file', 'pipe', 'ignore'])
+const validModes = new Set(['file', 'stream', 'ignore'])
 
 const isValidMode = mode =>
   validModes.has(mode)
@@ -82,7 +82,7 @@ export const commandHandler = options => {
 
         return tempFileStreamable(outPath)
 
-      } else if(outputMode === 'pipe') {
+      } else if(outputMode === 'stream') {
         const stdoutStreamable = reuseStream(
           nodeToQuiverReadStream(command.stdout))
 
