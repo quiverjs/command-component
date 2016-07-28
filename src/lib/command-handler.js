@@ -3,6 +3,8 @@ import { path as tempPath } from 'temp'
 import { spawn as spawnProcess } from 'child_process'
 
 import { error } from 'quiver-core/util/error'
+import { assertFunction } from 'quiver-core/util/assert'
+import { overrideConfig  } from 'quiver-core/component/method'
 
 import {
   reuseStream, streamableToText,
@@ -20,101 +22,103 @@ import { streamHandlerBuilder } from 'quiver-core/component/constructor'
 
 import { awaitProcess } from './await'
 
-const validModes = {
-  'file': true,
-  'pipe': true,
-  'ignore': true
-}
+const validModes = new Set(['file', 'pipe', 'ignore'])
 
-export const commandHandler = streamHandlerBuilder(
-config => {
-  const {
-    cmdArgsExtractor, inputMode, outputMode,
-    commandTimeout, tempPathBuilder=tempPath,
-  } = config::extract()
+const isValidMode = mode =>
+  validModes.has(mode)
 
-  if(typeof(cmdArgsExtractor) != 'function')
-    throw new Error('command args extractor must be function')
-
-  if(!validModes[inputMode] || !validModes[outputMode])
+export const commandHandler = options => {
+  const { inputMode, outputMode } = options
+  
+  if(!isValidMode(inputMode) || !isValidMode(outputMode))
     throw new Error('invalid input/output mode')
 
-  const inputFileMode = (inputMode == 'file')
-  const inputPipeMode = (inputMode == 'pipe')
-  const inputIgnoreMode = (inputMode == 'ignore')
+  return streamHandlerBuilder(config => {
+    const {
+      commandArgsExtractor,
+      commandTimeout,
+      tempPathBuilder=tempPath
+    } = config::extract()
 
-  const outputFileMode = (outputMode == 'file')
-  const outputPipeMode = (outputMode == 'pipe')
-  const outputIgnoreMode = (outputMode == 'ignore')
+    return async (args, inputStreamable) => {
+      let inputIsTemp = false
 
-  return async (args, inputStreamable) => {
-    let inputIsTemp = false
+      let inPath = null
+      if(inputMode == 'file') {
+        const fileStreamable = await toFileStreamable(
+          inputStreamable, tempPathBuilder)
 
-    let inPath = null
-    if(inputFileMode) {
-      const fileStreamable = await toFileStreamable(
-        inputStreamable, tempPathBuilder)
+        inputIsTemp = fileStreamable.tempFile
 
-      inputIsTemp = fileStreamable.tempFile
-
-      inPath = await fileStreamable.toFilePath()
-      args = args.set('inputFile', inPath)
-    }
-
-    let outPath = null
-    if(outputFileMode) {
-      outPath = await tempPathBuilder()
-      args = args.set('outputFile', outPath)
-    }
-
-    const commandArgs = await cmdArgsExtractor(args)
-
-    const command = spawnProcess(commandArgs[0],
-      commandArgs.slice(1))
-
-    if(inputFileMode || inputIgnoreMode) {
-      command.stdin.end()
-    } else {
-      const inputStream = await inputStreamable.toStream()
-      const stdinStream = nodeToQuiverWriteStream(command.stdin)
-      pipeStream(inputStream, stdinStream)
-    }
-
-    if(outputFileMode) {
-      command.stdout.resume()
-      command.stderr.resume()
-
-      try {
-        await awaitProcess(command, commandTimeout)
-      } finally {
-        if(inputIsTemp) unlink(inPath, ()=>{})
+        inPath = await fileStreamable.toFilePath()
+        args = args.set('inputFile', inPath)
       }
 
-      return tempFileStreamable(outPath)
-
-    } else if(outputPipeMode) {
-      const stdoutStreamable = reuseStream(
-        nodeToQuiverReadStream(command.stdout))
-
-      const stderrStreamable = reuseStream(
-        nodeToQuiverReadStream(command.stderr))
-
-      try {
-        await awaitProcess(command, commandTimeout)
-      } catch(err) {
-        const message = await streamableToText(stderrStreamable)
-        throw error(500, 'error executing command: ' + message)
+      let outPath = null
+      if(outputMode == 'file') {
+        outPath = await tempPathBuilder()
+        args = args.set('outputFile', outPath)
       }
 
-      return stdoutStreamable
-    } else {
-      command.stdout.resume()
-      command.stderr.resume()
+      const commandArgs = await commandArgsExtractor(args)
 
-      await awaitProcess(command, commandTimeout)
-      return emptyStreamable()
+      const command = spawnProcess(commandArgs[0],
+        commandArgs.slice(1))
+
+      if(inputMode == 'file' || inputMode == 'ignore') {
+        command.stdin.end()
+      } else {
+        const inputStream = await inputStreamable.toStream()
+        const stdinStream = nodeToQuiverWriteStream(command.stdin)
+        pipeStream(inputStream, stdinStream)
+      }
+
+      if(outputMode == 'file') {
+        command.stdout.resume()
+        command.stderr.resume()
+
+        try {
+          await awaitProcess(command, commandTimeout)
+        } finally {
+          if(inputIsTemp) unlink(inPath, ()=>{})
+        }
+
+        return tempFileStreamable(outPath)
+
+      } else if(outputMode == 'pipe') {
+        const stdoutStreamable = reuseStream(
+          nodeToQuiverReadStream(command.stdout))
+
+        const stderrStreamable = reuseStream(
+          nodeToQuiverReadStream(command.stderr))
+
+        try {
+          await awaitProcess(command, commandTimeout)
+        } catch(err) {
+          const message = await streamableToText(stderrStreamable)
+          throw error(500, 'error executing command: ' + message)
+        }
+
+        return stdoutStreamable
+      } else {
+        command.stdout.resume()
+        command.stderr.resume()
+
+        await awaitProcess(command, commandTimeout)
+        return emptyStreamable()
+      }
     }
-  }
-})
+  })
+}
 
-export const makeCommandHandler = commandHandler.export()
+export const simpleCommandHandler = options => {
+  const {
+    inputMode, outputMode, commandArgsExtractor
+  } = options
+
+  assertFunction(commandArgsExtractor,
+    'options.commandArgsExtractor must be function')
+
+  return commandHandler({ inputMode, outputMode })
+    ::overrideConfig({ commandArgsExtractor })
+}

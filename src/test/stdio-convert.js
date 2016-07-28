@@ -7,14 +7,13 @@ import { promisify } from 'quiver-core/util/promise'
 import { fileStreamable } from 'quiver-core/file-stream'
 import { streamableToText } from 'quiver-core/stream-util'
 
-import { overrideConfig  } from 'quiver-core/component/method'
 import {
   loadHandler,
   createArgs as Args,
   createConfig as Config
 } from 'quiver-core/component/util'
 
-import { commandHandler } from '../lib'
+import { simpleCommandHandler } from '../lib'
 
 const readFile = promisify(fs.readFile)
 
@@ -27,12 +26,11 @@ test('stdio convert test', assert => {
     const getCommandArgs = args =>
       ['grep', 'IPSUM']
 
-    const stdioConvertHandler = commandHandler()
-      ::overrideConfig({
-        cmdArgsExtractor: getCommandArgs,
-        inputMode: 'pipe',
-        outputMode: 'pipe'
-      })
+    const stdioConvertHandler = simpleCommandHandler({
+      commandArgsExtractor: getCommandArgs,
+      inputMode: 'pipe',
+      outputMode: 'pipe'
+    })
 
     const handler = await loadHandler(Config(), stdioConvertHandler)
     const streamable = await fileStreamable(testFile)

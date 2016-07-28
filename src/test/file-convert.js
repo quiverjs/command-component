@@ -8,14 +8,13 @@ import { promisify } from 'quiver-core/util/promise'
 import { fileStreamable } from 'quiver-core/file-stream'
 import { streamableToText } from 'quiver-core/stream-util'
 
-import { overrideConfig  } from 'quiver-core/component/method'
 import {
   loadHandler,
   createArgs as Args,
   createConfig as Config
 } from 'quiver-core/component/util'
 
-import { commandHandler } from '../lib'
+import { simpleCommandHandler } from '../lib'
 
 const readFile = promisify(fs.readFile)
 
@@ -34,16 +33,15 @@ test('file convert handler test', assert => {
       './test-content/temp/' + (new Date()).getTime()
         + '-' + (Math.random()*10000|0) + '.tmp'
 
+    const fileConvertHandler = simpleCommandHandler({
+      commandArgsExtractor: getCommandArgs,
+      inputMode: 'file',
+      outputMode: 'file'
+    })
+
     const config = Config({
       tempPathBuilder
     })
-
-    const fileConvertHandler = commandHandler()
-      ::overrideConfig({
-        cmdArgsExtractor: getCommandArgs,
-        inputMode: 'file',
-        outputMode: 'file'
-      })
 
     const handler = await loadHandler(config, fileConvertHandler)
     const streamable = await fileStreamable(testFile)

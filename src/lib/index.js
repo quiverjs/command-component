@@ -1,5 +1,1 @@
-import { makeCommandHandler } from '../lib/command-handler.js'
-
-export {
-  makeCommandHandler as commandHandler
-}
+export { commandHandler, simpleCommandHandler } from './command-handler'
