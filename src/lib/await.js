@@ -1,15 +1,19 @@
 import { error } from 'quiver-core/util/error'
+import { commandError } from './error'
 
 export const awaitProcess = (process, timeout=-1) =>
   new Promise((resolve, reject) => {
     let processExited = false
 
-    process.on('exit', code => {
+    process.on('exit', exitCode => {
       if(processExited) return
 
       processExited = true
-      if(code != 0) return reject(error(500,
-        'child process exited with error code ' + code))
+      if(exitCode == 0) {
+        resolve()
+      } else {
+        reject(commandError(exitCode, 'error in executing child process'))
+      }
 
       resolve()
     })

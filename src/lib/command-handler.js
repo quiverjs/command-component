@@ -2,7 +2,6 @@ import { unlink } from 'fs'
 import { path as tempPath } from 'temp'
 import { spawn as spawnProcess } from 'child_process'
 
-import { error } from 'quiver-core/util/error'
 import { assertFunction } from 'quiver-core/util/assert'
 import { overrideConfig  } from 'quiver-core/component/method'
 
@@ -21,6 +20,7 @@ import { extract } from 'quiver-core/util/immutable'
 import { streamHandlerBuilder } from 'quiver-core/component/constructor'
 
 import { awaitProcess } from './await'
+import { commandError } from './error'
 
 const validModes = new Set(['file', 'stream', 'ignore'])
 
@@ -92,8 +92,9 @@ export const commandHandler = options => {
         try {
           await awaitProcess(command, commandTimeout)
         } catch(err) {
+          const { exitCode } = err
           const message = await streamableToText(stderrStreamable)
-          throw error(500, 'error executing command: ' + message)
+          throw commandError(exitCode, `command failed with code ${exitCode}: ${message}`)
         }
 
         return stdoutStreamable
