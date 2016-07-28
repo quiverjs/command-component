@@ -1,9 +1,7 @@
-BABEL_FLAGS=--blacklist=es6.blockScoping,es6.constants,es6.forOf,regenerator 
-
 build: src
-	babel src --out-dir out $(BABEL_FLAGS)
+	babel --presets 'quiver-babel/node-preset' --out-dir dist src
 
 test: build
-	mocha out/test
+	node dist/test
 
 .PHONY: build test

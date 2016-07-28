@@ -1,17 +1,16 @@
-import { error } from 'quiver/error'
-import { createPromise } from 'quiver/promise'
+import { error } from 'quiver-core/util/error'
 
 export const awaitProcess = (process, timeout=-1) =>
-  createPromise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     let processExited = false
 
     process.on('exit', code => {
       if(processExited) return
 
       processExited = true
-      if(code != 0) return reject(error(500, 
+      if(code != 0) return reject(error(500,
         'child process exited with error code ' + code))
-      
+
       resolve()
     })
 
@@ -23,7 +22,7 @@ export const awaitProcess = (process, timeout=-1) =>
         process.kill()
 
         reject(error(500, 'child process timeout'))
-        
+
       }, timeout)
     }
   })

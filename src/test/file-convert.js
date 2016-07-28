@@ -1,46 +1,58 @@
-import { async } from 'quiver/promise'
-import { fileStreamable } from 'quiver/file-stream'
-import { streamableToText } from 'quiver/stream-util'
-
 import fs from 'fs'
-const { readFileSync } = fs
+import test from 'tape'
+import { asyncTest } from 'quiver-core/util/tape'
 
-import { commandHandler } from '../lib/command-component.js'
+import { extract } from 'quiver-core/util/immutable'
+import { promisify } from 'quiver-core/util/promise'
 
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
+import { fileStreamable } from 'quiver-core/file-stream'
+import { streamableToText } from 'quiver-core/stream-util'
 
-chai.use(chaiAsPromised)
-const should = chai.should()
+import { overrideConfig  } from 'quiver-core/component/method'
+import {
+  loadHandler,
+  createArgs as Args,
+  createConfig as Config
+} from 'quiver-core/component/util'
 
-describe('file convert handler test', () => {
-  it('basic test', async(function*() {
+import { commandHandler } from '../lib'
+
+const readFile = promisify(fs.readFile)
+
+test('file convert handler test', assert => {
+  assert::asyncTest('basic test', async assert => {
     const testFile = './test-content/00.txt'
     const expectedFile ='./test-content/00-ucase.txt'
-    const expectedResult = readFileSync(expectedFile).toString()
+    const expectedResult = (await readFile(expectedFile)).toString()
 
-    const getCommandArgs = ({inputFile, outputFile}) =>
-      ['dd', 'if='+inputFile, 'of='+outputFile, 'conv=ucase']
-
-    const tempPathBuilder = () =>
-      './test-content/temp/' + (new Date()).getTime() 
-        + '-' + (Math.random()*10000|0) + '.tmp'
-
-    const config = {
-      tempPathBuilder
+    const getCommandArgs = args => {
+      const { inputFile, outputFile } = args::extract()
+      return ['dd', `if=${inputFile}`, `of=${outputFile}`, 'conv=ucase']
     }
 
+    const tempPathBuilder = () =>
+      './test-content/temp/' + (new Date()).getTime()
+        + '-' + (Math.random()*10000|0) + '.tmp'
+
+    const config = Config({
+      tempPathBuilder
+    })
+
     const fileConvertHandler = commandHandler()
-      .configOverride({
+      ::overrideConfig({
         cmdArgsExtractor: getCommandArgs,
         inputMode: 'file',
         outputMode: 'file'
       })
 
-    const handler = yield fileConvertHandler.loadHandler(config)
-    const streamable = yield fileStreamable(testFile)
+    const handler = await loadHandler(config, fileConvertHandler)
+    const streamable = await fileStreamable(testFile)
 
-    yield handler({}, streamable).then(streamableToText)
-      .should.eventually.equal(expectedResult)
-  }))
+    const result = await handler(Args(), streamable)
+      .then(streamableToText)
+
+    assert.equal(result, expectedResult)
+
+    assert.end()
+  })
 })

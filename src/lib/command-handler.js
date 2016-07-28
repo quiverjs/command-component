@@ -1,28 +1,24 @@
-import { error } from 'quiver/error'
-import { async, createPromise } from 'quiver/promise'
-import { streamHandlerBuilder } from 'quiver/component'
+import { unlink } from 'fs'
+import { path as tempPath } from 'temp'
+import { spawn as spawnProcess } from 'child_process'
 
-import fs from 'fs'
-const { unlink } = fs
+import { error } from 'quiver-core/util/error'
 
-import tempLib from 'temp'
-const { path: tempPath } = tempLib
-
-import childProcess from 'child_process'
-const { spawn: spawnProcess } = childProcess
-
-import { 
-  reuseStream, streamableToText, 
+import {
+  reuseStream, streamableToText,
   pipeStream, emptyStreamable,
-  nodeToQuiverReadStream, 
-  nodeToQuiverWriteStream 
-} from 'quiver/stream-util'
+  nodeToQuiverReadStream,
+  nodeToQuiverWriteStream
+} from 'quiver-core/stream-util'
 
-import { 
-  toFileStreamable, tempFileStreamable 
-} from 'quiver/file-stream'
+import {
+  toFileStreamable, tempFileStreamable
+} from 'quiver-core/file-stream'
 
-import { awaitProcess } from './await.js'
+import { extract } from 'quiver-core/util/immutable'
+import { streamHandlerBuilder } from 'quiver-core/component/constructor'
+
+import { awaitProcess } from './await'
 
 const validModes = {
   'file': true,
@@ -32,10 +28,10 @@ const validModes = {
 
 export const commandHandler = streamHandlerBuilder(
 config => {
-  const { 
+  const {
     cmdArgsExtractor, inputMode, outputMode,
     commandTimeout, tempPathBuilder=tempPath,
-  } = config
+  } = config::extract()
 
   if(typeof(cmdArgsExtractor) != 'function')
     throw new Error('command args extractor must be function')
@@ -51,32 +47,35 @@ config => {
   const outputPipeMode = (outputMode == 'pipe')
   const outputIgnoreMode = (outputMode == 'ignore')
 
-  return async(function*(args, inputStreamable) {
+  return async (args, inputStreamable) => {
     let inputIsTemp = false
 
+    let inPath = null
     if(inputFileMode) {
-      const fileStreamable = yield toFileStreamable(
+      const fileStreamable = await toFileStreamable(
         inputStreamable, tempPathBuilder)
 
       inputIsTemp = fileStreamable.tempFile
 
-      args.inputFile = yield fileStreamable.toFilePath()
+      inPath = await fileStreamable.toFilePath()
+      args = args.set('inputFile', inPath)
     }
 
     let outPath = null
     if(outputFileMode) {
-      outPath = args.outputFile = yield tempPathBuilder()
+      outPath = await tempPathBuilder()
+      args = args.set('outputFile', outPath)
     }
 
-    const commandArgs = yield cmdArgsExtractor(args)
+    const commandArgs = await cmdArgsExtractor(args)
 
-    const command = spawnProcess(commandArgs[0], 
+    const command = spawnProcess(commandArgs[0],
       commandArgs.slice(1))
 
     if(inputFileMode || inputIgnoreMode) {
       command.stdin.end()
     } else {
-      const inputStream = yield inputStreamable.toStream()
+      const inputStream = await inputStreamable.toStream()
       const stdinStream = nodeToQuiverWriteStream(command.stdin)
       pipeStream(inputStream, stdinStream)
     }
@@ -86,7 +85,7 @@ config => {
       command.stderr.resume()
 
       try {
-        yield awaitProcess(command, commandTimeout)
+        await awaitProcess(command, commandTimeout)
       } finally {
         if(inputIsTemp) unlink(inPath, ()=>{})
       }
@@ -101,9 +100,9 @@ config => {
         nodeToQuiverReadStream(command.stderr))
 
       try {
-        yield awaitProcess(command, commandTimeout)
+        await awaitProcess(command, commandTimeout)
       } catch(err) {
-        const message = yield streamableToText(stderrStreamable)
+        const message = await streamableToText(stderrStreamable)
         throw error(500, 'error executing command: ' + message)
       }
 
@@ -112,10 +111,10 @@ config => {
       command.stdout.resume()
       command.stderr.resume()
 
-      yield awaitProcess(command, commandTimeout)
+      await awaitProcess(command, commandTimeout)
       return emptyStreamable()
     }
-  })
+  }
 })
 
-export const makeCommandHandler = commandHandler.factory()
+export const makeCommandHandler = commandHandler.export()
