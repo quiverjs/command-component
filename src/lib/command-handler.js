@@ -14,7 +14,7 @@ import {
 } from 'quiver-core/stream-util'
 
 import {
-  toFileStreamable, tempFileStreamable
+  streamableToFile, tempFileStreamable
 } from 'quiver-core/file-stream'
 
 import { extract } from 'quiver-core/util/immutable'
@@ -29,7 +29,7 @@ const isValidMode = mode =>
 
 export const commandHandler = options => {
   const { inputMode, outputMode } = options
-  
+
   if(!isValidMode(inputMode) || !isValidMode(outputMode))
     throw new Error('invalid input/output mode')
 
@@ -44,18 +44,15 @@ export const commandHandler = options => {
       let inputIsTemp = false
 
       let inPath = null
-      if(inputMode == 'file') {
-        const fileStreamable = await toFileStreamable(
+      if(inputMode === 'file') {
+        ;[inPath, inputIsTemp] = await streamableToFile(
           inputStreamable, tempPathBuilder)
 
-        inputIsTemp = fileStreamable.tempFile
-
-        inPath = await fileStreamable.toFilePath()
         args = args.set('inputFile', inPath)
       }
 
       let outPath = null
-      if(outputMode == 'file') {
+      if(outputMode === 'file') {
         outPath = await tempPathBuilder()
         args = args.set('outputFile', outPath)
       }
@@ -65,7 +62,7 @@ export const commandHandler = options => {
       const command = spawnProcess(commandArgs[0],
         commandArgs.slice(1))
 
-      if(inputMode == 'file' || inputMode == 'ignore') {
+      if(inputMode === 'file' || inputMode === 'ignore') {
         command.stdin.end()
       } else {
         const inputStream = await inputStreamable.toStream()
@@ -73,7 +70,7 @@ export const commandHandler = options => {
         pipeStream(inputStream, stdinStream)
       }
 
-      if(outputMode == 'file') {
+      if(outputMode === 'file') {
         command.stdout.resume()
         command.stderr.resume()
 
@@ -85,7 +82,7 @@ export const commandHandler = options => {
 
         return tempFileStreamable(outPath)
 
-      } else if(outputMode == 'pipe') {
+      } else if(outputMode === 'pipe') {
         const stdoutStreamable = reuseStream(
           nodeToQuiverReadStream(command.stdout))
 
