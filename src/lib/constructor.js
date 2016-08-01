@@ -1,1 +1,1 @@
-export { commandHandler, simpleCommandHandler } from './command-handler'
+export { commandHandler, simpleCommandHandler } from './simple'

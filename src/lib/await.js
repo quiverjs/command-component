@@ -12,7 +12,7 @@ export const awaitProcess = (process, timeout=-1) =>
       if(exitCode == 0) {
         resolve()
       } else {
-        reject(commandError(exitCode, 'error in executing child process'))
+        reject(commandError(exitCode, `child process exited with non-zero exit code ${exitCode}`))
       }
 
       resolve()
