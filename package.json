@@ -6,14 +6,15 @@
   },
   "name": "quiver-command-component",
   "desription": "Quiver components that wrap around command line",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "homepage": "https://github.com/quiverjs/quiver-command-component",
   "repository": {
     "url": "git@github.com:quiverjs/quiver-command-component.git"
   },
   "dependencies": {
-    "temp": "^0.8.3",
-    "quiver-core": "^2.0.5"
+    "quiver-core": "^2.0.5",
+    "quiver-stream-util": "^1.5.0",
+    "temp": "^0.8.3"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

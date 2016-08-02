@@ -1,8 +1,8 @@
 import { spawn as spawnNodeProcess } from 'child_process'
-import { pipeStreamableToNodeStream } from 'quiver-core/http'
 import {
   streamToStreamable,
-  nodeToQuiverReadStream
+  nodeToQuiverReadStream,
+  pipeStreamableToNodeStream
 } from 'quiver-core/stream-util'
 
 import { awaitProcess } from './await'
